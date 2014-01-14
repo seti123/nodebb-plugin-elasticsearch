@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-elasticsearch",
   "version": "0.0.0",
-  "description": "A ES indexer for NodeBB",
+  "description": "An ES indexer for NodeBB",
   "main": "index.js",
 }
