@@ -1,0 +1,14 @@
+{
+    "id": "elasticsearch-plugin",
+    "name": "Plugin to index posts in ElasticSearch",
+    "description": "Index posts to ElasticSearch Index nodebb",
+    "url": "Absolute URL to your plugin or a Github repository",
+    "library": "./elasticsearch-plugin.js",
+    "staticDir": "/public",
+    "css": [
+        "style.css"
+    ],
+    "hooks": [
+        { "hook": "action:post.save", "method": "indexPost" }
+    ]
+}
