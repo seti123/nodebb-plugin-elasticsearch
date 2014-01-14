@@ -2,6 +2,7 @@
 var EsPlugin = {
         indexPost: function(postData) {
             // do something with postData here
-            console.log (JSON.stringify(postData))
+            // so what do we get here ?
+            console.log (JSON.stringify(postData));
         }
     };
