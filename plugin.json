@@ -2,7 +2,7 @@
     "id": "elasticsearch-plugin",
     "name": "Plugin to index posts in ElasticSearch",
     "description": "Index posts to ElasticSearch Index nodebb",
-    "url": "Absolute URL to your plugin or a Github repository",
+    "url": "https://github.com/seti123/nodebb-plugin-elasticsearch",
     "library": "./elasticsearch-plugin.js",
     "staticDir": "/public",
     "css": [
