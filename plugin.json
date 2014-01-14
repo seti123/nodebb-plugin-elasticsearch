@@ -1,5 +1,5 @@
 {
-    "id": "elasticsearch-plugin",
+    "id": "nodebb-plugin-elasticsearch",
     "name": "Plugin to index posts in ElasticSearch",
     "description": "Index posts to ElasticSearch Index nodebb",
     "url": "https://github.com/seti123/nodebb-plugin-elasticsearch",
