@@ -1,6 +1,9 @@
 //elasticsearch-plugin.js
-var topics = require('../../src/topics');
-var posts = require('../../src/posts');
+var topics =  require('../../src/topics');
+// module.parent.require('./topics');
+// module.parent.require('./topics')
+var posts =  require('../../src/posts');
+// odule.parent.require('./topics');
 var esHost = "localhost:9200"
 var postIndex = "nodebb_posts";
 var elasticsearch = require('elasticsearch');
@@ -58,7 +61,7 @@ function indexAll ()
                   if (!err) 
                   {
                       
-                      posts.forEach ( function (i, e) {   insertToEs (i) } );
+                      posts.forEach ( function (e, i) {   EsPlugin.indexPost (e) } );
                   } else console.log (err);
 
                 });
@@ -93,9 +96,9 @@ var EsPlugin = {
             console.log (JSON.stringify(postData));
             topics.getTopicField(postData.tid, 'title', function(err, title) {
             // use title
-            postData.title = title;
-            insertToEs (postData);
-      });
+                postData.title = title;
+                insertToEs (postData);
+            });
         },
         
         
