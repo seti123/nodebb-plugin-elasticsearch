@@ -2,17 +2,23 @@ Trial to index nodebb posts, as far I see there is no hook to execute search and
 ```
 TODO / open questions: 
 1) How to hook into post changes?
-2) Any plugin-Api in node BB to perform search?
+2) Any plugin-api in node BB to perform search?
    should be in 2 stages, ES gives back postId's
    nodeBB checks permissions and displays result.
    E.g. fireSearchAction with callbackFunction that passes post ID's
    All TBD with nodeBB developers ...
-3) Maybe indexing existing posts with a little node script
 4) Possibility to read ElasticSearch properties from config.json
    Es Host, Port, indexname, create automatic mapping.
    
 What works:
 - indexing new posts to local ES server (localhost:9200)
+- automatic index creation "nodebb_posts"
+- automatic setting of index mapping for autocompletion 
+- on plugin activation in NodeBB admin GUI, ALL existing posts are indexed automatically
+   TODO: store last index date, and index only new ... well but plugin 
+   might be activated only once, and it might be an option to trigger the process
+   again e.g after changeing ES server ...
+   
 ```
 
 # Installation (on Debian)
@@ -28,29 +34,13 @@ dpkg -i elasticsearch-0.90.6.deb
 
 open browser and go to http://localhost:9200/_plugin/head
 ```
-## 2) Setup index for nodeBB to support auto suggest
-```
-curl -X PUT localhost:9200/nodebb_posts -d '
-{
-  "mappings": {
-    "nodebb_posts" : {
-      "properties" : {
-        "content" : { "type" : "string" },
-        "title" : { "type" : "string" },
-        "content_suggest" : {
-          "type" :     "completion"
-        }
-      }
-    }
-  }
-}'
-```
-## 3) NodeBB plugin 
+
+## 2) NodeBB plugin 
 ```
    npm install seti123/nodebb-plugin-elasticsearch
 ```
 
-## 4) restart nodeBB (./nodebb dev) and make some posts in nodeBB
+## 3) restart nodeBB (./nodebb dev), activate plugin in admin and make some posts in nodeBB
 ```
 # to see plugin loading and debug out put ...
 ./nodebb dev
