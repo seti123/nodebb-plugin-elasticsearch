@@ -17,7 +17,7 @@ What works:
 - on plugin activation in NodeBB admin GUI, ALL existing posts are indexed automatically
    TODO: store last index date, and index only new ... well but plugin 
    might be activated only once, and it might be an option to trigger the process
-   again e.g after changeing ES server ...
+   again e.g after changing ES server ...
    
 ```
 
