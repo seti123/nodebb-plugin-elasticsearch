@@ -8,6 +8,9 @@ var client = new elasticsearch.Client({
   log: 'trace'
 });
 
+var htmlToText = require('html-to-text');
+
+
 var EsPlugin = {
         indexPost: function(postData) {
             // do something with postData here
@@ -29,9 +32,13 @@ var insertToEs = function (postData) {
             // collect complete post title, text
             // Upsert is used to either insert or update the document
             console.log ("insertToEs: " + JSON.stringify (postData));
+            // Lets play around with autosuggestion
+            // - if any word from post is typed, we want suggest post title
+            // - if begin of Post tiel is typed as well ...
+            postData.content_suggest = { input: [ htmlToText.fromString (postData.title), htmlToText.fromString (postData.content).split(' ') ] , output: postData.title };
             client.index({
                   index: postIndex,
-                  type: 'nodebb_post',
+                  type: 'nodebb_posts',
                   id: postData.pid,
                   body: postData  
                   //upsert: postDat
@@ -41,6 +48,10 @@ var insertToEs = function (postData) {
                             console.log (error);
                         else
                             console.log (response);
+                        // to avoid side effects n modified postData object
+                        // we remove added properties. 
+                        delete postData.content_suggest;
+                        delete postData.title
               });
             
         }
