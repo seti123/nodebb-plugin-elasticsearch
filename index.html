@@ -1,83 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
     <title>Nodebb-plugin-elasticsearch by seti123</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>Nodebb-plugin-elasticsearch</h1>
-        <h2>A simple test to catch nodebb postings and index it in Elasticsearch</h2>
-        <a href="https://github.com/seti123/nodebb-plugin-elasticsearch" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/seti123/nodebb-plugin-elasticsearch">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/seti123/nodebb-plugin-elasticsearch/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/seti123/nodebb-plugin-elasticsearch/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+    <div class="wrapper">
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+      <section>
+        <div id="title">
+          <h1>Nodebb-plugin-elasticsearch</h1>
+          <p>adding advanced fulltext search to NodeBB</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/seti123">seti123</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+        <p>We just started the project to index nodebb posts ...</p>
+
+<pre><code>TODO / open questions: 
+1) How to hook into post changes?
+2) Any plugin-api in node BB to perform search?
+   should be in 2 stages, ES gives back postId's
+   nodeBB checks permissions and displays result.
+   E.g. fireSearchAction with callbackFunction that passes post ID's
+   All TBD with nodeBB developers ...
+4) Possibility to read ElasticSearch properties from config.json
+   Es Host, Port, indexname, create automatic mapping.
+
+What works:
+- indexing new posts to local ES server (localhost:9200)
+- automatic index creation "nodebb_posts"
+- automatic setting of index mapping for autocompletion 
+- on plugin activation in NodeBB admin GUI, ALL existing posts are indexed automatically
+   TODO: store last index date, and index only new ... well but plugin 
+   might be activated only once, and it might be an option to trigger the process
+   again e.g after changing ES server ...
+
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h1>
+<a name="installation-on-debian" class="anchor" href="#installation-on-debian"><span class="octicon octicon-link"></span></a>Installation (on Debian)</h1>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<h2>
+<a name="1-elasticsearch-server" class="anchor" href="#1-elasticsearch-server"><span class="octicon octicon-link"></span></a>1) ElasticSearch server</h2>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<pre><code>apt-get install openjdk-7-jre-headless -y
+wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.6.deb
+dpkg -i elasticsearch-0.90.6.deb
+## install some useful plugins
+/usr/share/elasticsearch/bin/plugin -install mobz/elasticsearch-head
+/usr/share/elasticsearch/bin/plugin --install jettro/elasticsearch-gui 
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+open browser and go to http://localhost:9200/_plugin/head
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<h2>
+<a name="2-nodebb-plugin" class="anchor" href="#2-nodebb-plugin"><span class="octicon octicon-link"></span></a>2) NodeBB plugin</h2>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<pre><code>   npm install seti123/nodebb-plugin-elasticsearch
+</code></pre>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<h2>
+<a name="3-restart-nodebb-nodebb-dev-activate-plugin-in-admin-and-make-some-posts-in-nodebb" class="anchor" href="#3-restart-nodebb-nodebb-dev-activate-plugin-in-admin-and-make-some-posts-in-nodebb"><span class="octicon octicon-link"></span></a>3) restart nodeBB (./nodebb dev), activate plugin in admin and make some posts in nodeBB</h2>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<pre><code># to see plugin loading and debug out put ...
+./nodebb dev
+</code></pre>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-        </section>
+<h2>
+<a name="5-check-autocomplete-feature-or-search" class="anchor" href="#5-check-autocomplete-feature-or-search"><span class="octicon octicon-link"></span></a>5) Check autocomplete feature or search</h2>
 
-        <aside id="sidebar">
-          <a href="https://github.com/seti123/nodebb-plugin-elasticsearch/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/seti123/nodebb-plugin-elasticsearch/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+<pre><code>curl -X POST localhost:9200/nodebb_posts/_suggest -d '
+{
+  "nodebb_posts" : {
+    "text" : "ElasticSearch",
+    "completion" : {
+      "field" : "content_suggest"
+    }
+  }
+}'
+</code></pre>
 
-          <p class="repo-owner"><a href="https://github.com/seti123/nodebb-plugin-elasticsearch"></a> is maintained by <a href="https://github.com/seti123">seti123</a>.</p>
+<p>Title suggested for autocomplete:</p>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+<pre><code>{"_shards":{"total":5,"successful":5,"failed":0},"nodebb_posts":[{"text":"ElasticSearch","offset":0,"length":13,"options":[{"text":"Another new blog","score":1.0}]}]}
+</code></pre>
+
+<p>Lets search</p>
+
+<pre><code>curl localhost:9200/nodebb_posts/_search?q=new
+</code></pre>
+
+<p>Result:</p>
+
+<pre><code>{
+
+    "took": 3,
+    "timed_out": false,
+    "_shards": {
+        "total": 5,
+        "successful": 5,
+        "failed": 0
+    },
+    "hits": {
+        "total": 2,
+        "max_score": 0.25,
+        "hits": [
+            {
+                "_index": "nodebb_posts",
+                "_type": "nodebb_posts",
+                "_id": "26",
+                "_score": 0.25,
+                "_source": {
+                    "pid": 26,
+                    "uid": "1",
+                    "tid": 23,
+                    "content": "&lt;p&gt;this is the first blog entry with ElasticSearch support&lt;/p&gt;\n",
+                    "timestamp": 1389789466903,
+                    "reputation": 0,
+                    "editor": "",
+                    "edited": 0,
+                    "deleted": 0,
+                    "title": "A new blog",
+                    "content_suggest": [
+                        "A new blog",
+                        "&lt;p&gt;this is the first blog entry with ElasticSearch support&lt;/p&gt;\n"
+                    ]
+                }
+            },
+
+            ....
+</code></pre>
+      </section>
+
     </div>
-
-  
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
   </body>
 </html>
