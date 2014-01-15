@@ -6,8 +6,8 @@
   "engines": {
     "node": ">=0.8"
   },
-  "dependencies" : [
+  "dependencies" : {
       "elasticsearch" : "*",
       "html-to-text" : "*"
-    ]
+  }
 }
