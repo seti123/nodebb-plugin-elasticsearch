@@ -6,3 +6,5 @@ var EsPlugin = {
             console.log (JSON.stringify(postData));
         }
     };
+
+module.exports.indexPost = EsPlugin.indexPost
