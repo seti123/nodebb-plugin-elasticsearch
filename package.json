@@ -7,6 +7,7 @@
     "node": ">=0.8"
   },
   "dependencies" : [
-      "elasticsearch" : "*"
+      "elasticsearch" : "*",
+      "html-to-text" : "*"
     ]
 }
