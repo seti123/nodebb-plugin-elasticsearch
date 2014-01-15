@@ -2,5 +2,8 @@
   "name": "nodebb-plugin-elasticsearch",
   "version": "0.0.1",
   "description": "An ES indexer for NodeBB",
-  "main": "index.js"
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.8"
+  }
 }
