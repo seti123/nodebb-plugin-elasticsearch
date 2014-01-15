@@ -75,8 +75,11 @@ Title suggested for autocomplete:
 Lets search
 ```
 curl localhost:9200/nodebb_posts/_search?q=new
+```
 
 Result:
+
+```
 {
 
     "took": 3,
