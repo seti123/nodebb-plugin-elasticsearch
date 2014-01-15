@@ -13,6 +13,7 @@ TODO / open questions:
    
 What works:
 - indexing new posts to local ES server (localhost:9200)
+```
 
 # Installation (on Debian)
 ## 1) ElasticSearch server
@@ -21,7 +22,7 @@ What works:
 apt-get install openjdk-7-jre-headless -y
 wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.6.deb
 dpkg -i elasticsearch-0.90.6.deb
-# installl some useful plugins
+## install some useful plugins
 /usr/share/elasticsearch/bin/plugin -install mobz/elasticsearch-head
 /usr/share/elasticsearch/bin/plugin --install jettro/elasticsearch-gui 
 
