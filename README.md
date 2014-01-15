@@ -1,4 +1,18 @@
 Trial to index nodebb posts, as far I see there is no hook to execute search and send back results to nodebb. How to do this?
+```
+TODO / open questions: 
+1) How to hook into post changes?
+2) Any plugin-Api in node BB to perform search?
+   should be in 2 stages, ES gives back postId's
+   nodeBB checks permissions and displays result.
+   E.g. fireSearchAction with callbackFunction that passes post ID's
+   All TBD with nodeBB developers ...
+3) Maybe indexing existing posts with a little node script
+4) Possibility to read ElasticSearch properties from config.json
+   Es Host, Port, indexname, create automatic mapping.
+   
+What works:
+- indexing new posts to local ES server (localhost:9200)
 
 # Installation (on Debian)
 ## 1) ElasticSearch server
