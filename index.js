@@ -41,7 +41,6 @@ var insertToEs = function (postData) {
                   type: 'nodebb_posts',
                   id: postData.pid,
                   body: postData  
-                  //upsert: postDat
               }, 
               function (error, response) {
                         if (error) 
