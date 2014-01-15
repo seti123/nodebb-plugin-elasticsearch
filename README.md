@@ -54,7 +54,7 @@ curl -X PUT localhost:9200/nodebb_posts -d '
 ```
 # to see plugin loading and debug out put ...
 ./nodebb dev
-
+```
 ## 5) Check autocomplete feature or search 
 
 ```
