@@ -36,12 +36,15 @@ open browser and go to http://localhost:9200/_plugin/head
    npm install seti123/nodebb-plugin-elasticsearch
 ```
 
-## 3) restart nodeBB (./nodebb dev), activate plugin in admin and make some posts in nodeBB
+## 3) restart NodeBB (./nodebb dev), activate plugin in admin and make some posts in nodeBB
 ```
 # to see plugin loading and debug out put ...
 ./nodebb dev
 ```
-## 5) Check autocomplete feature or search 
+
+On the console you should see some dub messages about indexing all posts ...
+
+## 4) Check autocomplete feature or search 
 
 ```
 curl -X POST localhost:9200/nodebb_posts/_suggest -d '
@@ -60,10 +63,13 @@ Title suggested for autocomplete:
 ```
 Lets search
 ```
-curl localhost:9200/nodebb_posts/_search?q=new
+1) curl localhost:9200/nodebb_posts/_search?q=new
 ```
-
-Result:
+OR on NodeBB assuming on localhost
+```
+1) http://localhost/elasticsearch/*
+```
+Result 1):
 
 ```
 {
@@ -104,6 +110,52 @@ Result:
             
             ....
 ```
+Result 2) in NodeBB
+```
+{
 
+    "show_no_topics": "hide",
+    "show_no_posts": "hide",
+    "show_results": "",
+    "search_query": "*",
+    "posts": [
+        {
+            "pid": "27",
+            "tid": "24",
+            "content": "<p>My second entry with ElasticSearch support</p>\n",
+            "uid": "1",
+            "timestamp": "1389789491362",
+            "deleted": "0",
+            "fields": [
+                "pid",
+                "tid",
+                "content",
+                "uid",
+                "timestamp",
+                "deleted"
+            ],
+            "relativeTime": "2014-01-15T12:38:11.362Z",
+            "username": "admin",
+            "userslug": "admin",
+            "user_rep": "1",
+            "user_postcount": "37",
+            "user_banned": false,
+            "picture": "http://www.gravatar.com/avatar/9760b45791726e6374884945d694c57a?size=128&default=identicon&rating=pg",
+            "signature": "",
+            "additional_profile_info": "",
+            "editorname": null,
+            "editorslug": null,
+            "categoryName": "Blogs",
+            "categoryIcon": "fa-pencil",
+            "categorySlug": "4/blogs",
+            "title": "2nd entry",
+            "topicSlug": "24/2nd-entry"
+        },
+        {
+            "pid": "34",
+            "tid": "31",
+            "content": "<p>Amazing what you can do with ElasticSearch</p>\n",
+            ...
+```
 
 
