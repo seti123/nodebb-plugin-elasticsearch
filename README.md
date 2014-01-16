@@ -2,18 +2,14 @@ Trial to index nodebb posts, as far I see there is no hook to execute search and
 ```
 TODO / open questions: 
 1) How to hook into post changes?
-2) Any plugin-api in node BB to perform search?
-   should be in 2 stages, ES gives back postId's
-   nodeBB checks permissions and displays result.
-   E.g. fireSearchAction with callbackFunction that passes post ID's
-   All TBD with nodeBB developers ...
-4) Possibility to read ElasticSearch properties from config.json
-   Es Host, Port, indexname, create automatic mapping.
+2) How to redirect the search submit action to the plugin custom route?
+
    
 What works:
 - indexing new posts to local ES server (localhost:9200)
 - automatic index creation "nodebb_posts"
 - automatic setting of index mapping for autocompletion 
+- custom route /nodebb-plugin-elasticsearch/search/:term
 - on plugin activation in NodeBB admin GUI, ALL existing posts are indexed automatically
    TODO: store last index date, and index only new ... well but plugin 
    might be activated only once, and it might be an option to trigger the process
