@@ -13,7 +13,9 @@ var client = new elasticsearch.Client({
 });
 var extend = require('util')._extend;
 var htmlToText = require('html-to-text');
-
+var path = require('path'),
+  nconf = require('nconf'),
+  async = require('async')
 var EsPlugin = {
         indexPost: function(postData) {
             // do something with postData here
@@ -120,12 +122,13 @@ var insertToEs = function (postData) {
             // Lets play around with autosuggestion
             // - if any word from post is typed, we want suggest post title
             // - if begin of Post tiel is typed as well ...
-            postData.content_suggest = { input: [ htmlToText.fromString (postData.title), htmlToText.fromString (postData.content).split(' ') ] , output: postData.title };
+            var contentText = htmlToText.fromString (postData.content);
+            postData.content_suggest = { input: [ htmlToText.fromString (postData.title), contentText.split(' ') ] , output: postData.title };
             client.index({
                   index: postIndex,
                   type: 'nodebb_posts',
                   id: postData.pid +'',
-                  body: { tid: postData.tid, title: postData.title, pid: postData.pid, content: postData.content, content_suggest: postData.content_suggest, timestamp: postData.timestamp }   
+                  body: { tid: postData.tid, title: postData.title, pid: postData.pid, content: contentText, contentOriginal: postData.content, content_suggest: postData.content_suggest, timestamp: postData.timestamp }   
                   //upsert: postDat
               }, 
               function (error, response) {
@@ -188,8 +191,177 @@ var searchPostIds = function (term, limit, callback)
 
 }
 
+var searchTopicIds = function (term, limit, callback)
+{
 
-module.exports.indexPost = EsPlugin
+    var allPid = [];
+
+    // first we do a search, and specify a scroll timeout
+    client.search({
+      index: postIndex,
+      type: postIndex,
+      // Set to 30 seconds because we are calling right back
+      scroll: '30s',
+      fields: ['tid'],
+      q: term
+      ,size: limit
+    }, function getMoreUntilDone(error, response) {
+      // collect the title from each response
+      if (error)
+      {
+            console.log(error);
+            callback(error,null);
+            return;
+      }
+      console.log(response);
+      if (response.hits)
+      {
+
+      }
+      for (var i=0;i<response.hits.hits.length; i++)
+      {
+        allPid.push(response.hits.hits[i].fields.tid);
+      }
+      callback(null,allPid)
+      
+
+      if (response.hits.total !== allPid.length) {
+        // now we can call scroll over and over
+        client.scroll({
+          scrollId: response._scroll_id,
+          scroll: '30s'
+        }, getMoreUntilDone);
+      } else {
+        console.log('every "test" pid', allPid);
+      }
+    });
+}
+
+function xinspect(o,i){
+    if(typeof i=='undefined')i='';
+    if(i.length>50)return '[MAX ITERATIONS]';
+    var r=[];
+    for(var p in o){
+        var t=typeof o[p];
+        r.push(i+'"'+p+'" ('+t+') => '+(t=='object' ? 'object:'+xinspect(o[p],i+'  ') : o[p]+''));
+    }
+    return r.join(i+'\n');
+}
+
+/***************************************************
+* Experimental, try to replace /search/route
+* might not work becaue in webserver.js to this route /api/ gets preficed
+*/
+var addRoute = function(custom_routes, callback) 
+{
+
+      custom_routes.routes.push({
+              "route": '/search/:term',
+              "method": "get",
+              "options": function(req, res, callback) {
+                      actualSearchToHookIn (req,res,callback);
+              }
+      });
+      custom_routes.routes.push({
+              "route": '/nodebb-plugins-elasticsearch/search/:term',
+              "method": "get",
+              "options": function(req, res, callback) {
+                      actualSearchToHookIn (req,res,callback);
+              }
+      });
+
+      callback(null, custom_routes);
+};
+                
+
+var actualSearchToHookIn =  function (req, res, next) 
+{
+        var limit = 50;
+
+        function searchPosts(callback) {
+          //var esplugin = require ('nodebb-plugin-elasticsearch');
+          if (true)
+          {
+            searchPostIds (req.params.term, 500, function(err, pids) {
+            if (err) {
+              return callback(err, null);
+            }
+
+            posts.getPostSummaryByPids(pids, false, function (err, posts) {
+              if (err){
+                return callback(err, null);
+              }
+              callback(null, posts);
+            });
+
+
+          });
+          } else db.search('post', req.params.term, limit, function(err, pids) {
+            if (err) {
+              return callback(err, null);
+            }
+
+            posts.getPostSummaryByPids(pids, false, function (err, posts) {
+              if (err){
+                return callback(err, null);
+              }
+              callback(null, posts);
+            });
+          });
+        }
+
+        function searchTopics(callback) {
+          //var esplugin = require ('nodebb-plugin-elasticsearch');
+          if (true)
+          {
+              searchTopicIds (req.params.term, limit, function(err, tids) {
+              if (err) {
+                return callback(err, null);
+              }
+
+              topics.getTopicsByTids(tids, 0, function (topics) {
+                callback(null, topics);
+              }, 0);
+            });
+
+          } else db.search('topic', req.params.term, limit, function(err, tids) {
+            if (err) {
+              return callback(err, null);
+            }
+
+            topics.getTopicsByTids(tids, 0, function (topics) {
+              callback(null, topics);
+            }, 0);
+          });
+        }
+
+        if ((req.user && req.user.uid) || meta.config.allowGuestSearching === '1') {
+          async.parallel([searchPosts, searchTopics], function (err, results) {
+            if (err) {
+              return next(err);
+            }
+
+            return res.json({
+              show_no_topics: results[1].length ? 'hide' : '',
+              show_no_posts: results[0].length ? 'hide' : '',
+              show_results: '',
+              search_query: req.params.term,
+              posts: results[0],
+              topics: results[1],
+              post_matches : results[0].length,
+              topic_matches : results[1].length
+            });
+          });
+        } else {
+          res.send(403);
+        }
+};
+
+module.exports.indexPost = EsPlugin.indexPost
 module.exports.insertToEs = insertToEs
 module.exports.pluginActivated = pluginActivated
 module.exports.searchPostIds = searchPostIds;
+module.exports.searchTopicIds = searchTopicIds;
+module.exports.addRoute = addRoute;
+module.exports.actualSearchToHookIn=actualSearchToHookIn;
+
