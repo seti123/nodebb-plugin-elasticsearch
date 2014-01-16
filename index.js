@@ -14,6 +14,23 @@ var client = new elasticsearch.Client({
 var extend = require('util')._extend;
 var htmlToText = require('html-to-text');
 
+var EsPlugin = {
+        indexPost: function(postData) {
+            // do something with postData here
+            // so what do we get here ?
+            console.log (JSON.stringify(postData));
+            topics.getTopicField(postData.tid, 'title', function(err, title) {
+            // use title
+                postData.title = title;
+                insertToEs (postData);
+            });
+        },
+        
+
+        
+        
+    };
+
 function createIndex (cb)
 {
   client.indices.create ({
@@ -86,24 +103,12 @@ var pluginActivated = function (pluginId) {
         // we got something to do, its our plugin ...
         // lets index all  topics just to be sure nobody is disappointed on search ...
         createIndex ( indexAll );
-    } 
-}
+        // test
+        searchPostIds ('*Elastic*', 500, function (err, pids) {
 
-var EsPlugin = {
-        indexPost: function(postData) {
-            // do something with postData here
-            // so what do we get here ?
-            console.log (JSON.stringify(postData));
-            topics.getTopicField(postData.tid, 'title', function(err, title) {
-            // use title
-                postData.title = title;
-                insertToEs (postData);
-            });
-        },
-        
-        
-        
-    };
+        });
+    } 
+};
 
 
 var insertToEs = function (postData) {
@@ -135,6 +140,56 @@ var insertToEs = function (postData) {
               });
             
         }
-module.exports.indexPost = EsPlugin.indexPost
+
+var searchPostIds = function (term, limit, callback)
+{
+
+    var allPid = [];
+
+    // first we do a search, and specify a scroll timeout
+    client.search({
+      index: postIndex,
+      type: postIndex,
+      // Set to 30 seconds because we are calling right back
+      scroll: '30s',
+      fields: ['pid'],
+      q: term
+      ,size: limit
+    }, function getMoreUntilDone(error, response) {
+      // collect the title from each response
+      if (error)
+      {
+            console.log(error);
+            callback(error,null);
+            return;
+      }
+      console.log(response);
+      if (response.hits)
+      {
+
+      }
+      for (var i=0;i<response.hits.hits.length; i++)
+      {
+        allPid.push(response.hits.hits[i].fields.pid);
+      }
+      callback(null,allPid)
+      
+
+      if (response.hits.total !== allPid.length) {
+        // now we can call scroll over and over
+        client.scroll({
+          scrollId: response._scroll_id,
+          scroll: '30s'
+        }, getMoreUntilDone);
+      } else {
+        console.log('every "test" pid', allPid);
+      }
+    });
+
+}
+
+
+module.exports.indexPost = EsPlugin
 module.exports.insertToEs = insertToEs
 module.exports.pluginActivated = pluginActivated
+module.exports.searchPostIds = searchPostIds;
