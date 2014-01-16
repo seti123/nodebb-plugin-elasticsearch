@@ -1,4 +1,3 @@
-
 ```
 TODO / open questions: 
 1) How to hook into post changes?
@@ -9,7 +8,7 @@ What works:
 - indexing new posts to local ES server (localhost:9200)
 - automatic index creation "nodebb_posts"
 - automatic setting of index mapping for autocompletion 
-- custom route /nodebb-plugin-elasticsearch/search/:term
+- custom routes are /nodebb-plugin-elasticsearch/search/:term and /elasticsearch/search:term
 - on plugin activation in NodeBB admin GUI, ALL existing posts are indexed automatically
    TODO: store last index date, and index only new ... well but plugin 
    might be activated only once, and it might be an option to trigger the process
