@@ -2,6 +2,10 @@
 TODO / open questions: 
 1) How to hook into post changes?
 2) How to redirect the search submit action to the plugin custom route?
+      - I made a fork of NodeBB
+         if you use it go to admin / settings / posts and disabel DB search
+         then install the plugin as described below
+         (pull request made)
 
    
 What works:
@@ -13,6 +17,7 @@ What works:
    TODO: store last index date, and index only new ... well but plugin 
    might be activated only once, and it might be an option to trigger the process
    again e.g after changing ES server ...
+- search with elasticsearch on my NodeBB fork seti123/NodeBB
    
 ```
 
