@@ -1,3 +1,5 @@
+# THIS PLUGIN IST OUTDATED, NODEBB added the API-Hooks and I hope the plugin can be updated soon to new nodeBB API. 
+
 ```
 TODO / open questions: 
 1) How to hook into post changes?
